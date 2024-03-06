@@ -1,0 +1,393 @@
+/* PROJECT TITTLE : FERRY TICKETING SYSTEM
+   GROUP MEMBER : JIHA , NUHA , WANI , IMAN */
+
+
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+void boardingTime(string&);
+void addOnMenu();
+double discountValue(char);
+double calcIncome(double[], int[], int);
+void salesDetail(int[], double[], int, int, double, int, int);
+void receiptDetail(string, string, int, double, string, double, double);
+
+int main()
+{
+    //information
+    string name, num;
+    char start = ' ', option = ' ';
+    int date = 0, month = 0, year = 0, numPassen = 0;
+    char  destination = ' ', choose = ' ', status = ' ', paymentMethod = ' ';
+
+    //selection
+    string paymentType, time, payMethod , place ;
+    int countAge1 = 0, countAge2 = 0, aveTickets = 0, qty = 0, countPassen = 0, countOKU = 0;
+    const int NUM_TIMESLOTS = 5;
+    int count[NUM_TIMESLOTS] = { 0 };
+    double income[NUM_TIMESLOTS] = { 0.0 };
+    double sumPrice = 0.0, subAdd, tAdd = 0.0, subPrice, disRate, disPrice, tPrice = 0.0, incomeDay, discountRate = 0.0, tickets;
+    const double earlyBird = 0.10;
+
+    //Start the program
+    do
+    {
+        cout << "-----------------WELCOME TO SENANGBOOK.com---------------------";
+        cout << "\nDo you want to start ferry ticket system? [ Y-Yes | N-No ] : ";
+        cin >> start;
+
+        while (start != 'Y' && start != 'N')
+        {
+            cout << "\nRe-enter your code : ";
+            cin.ignore();
+            cin >> start;
+        }
+
+        //welcome screen
+        while (start == 'Y')
+        {
+            system("CLS");
+            cout << "***********************************************************";
+            cout << "\n\t\tWELCOME TO SENANGBOOK.com\t\t\t\t";
+            cout << "\n***********************************************************";
+            cout << "\n[ EARLY BIRD WILL GET 10% DISCOUNT ]" << endl;
+            cout << "\nPLEASE ENTER YOUR INFORMATION" << endl;
+            cout << "\n-----------------------------------------------------------" << endl;
+
+            //process start
+            cout << "\nEnter customer name : ";
+            cin.ignore();
+            getline(cin, name);
+            cout << "\nEnter phone number : ";
+            cin >> num;
+            cout << "\nEnter number of passengers: ";
+            cin >> numPassen;
+
+            for (int countPassen = 0; countPassen < numPassen; ++countPassen) {
+                int price = 0;
+
+                cout << "\nPassenger" << countPassen + 1 << endl;
+                cout << "\nEnter status [ N-Normal | O-OKU ] : ";
+                cin >> status;
+                while (status != 'N' && status != 'O')
+                {
+                    cout << "\nInvalid status. Please re-enter status : ";
+                    cin >> status;
+                }
+
+                cout << "\nEnter destination [ P-Pangkor Jetty | M-Marina Jetty ] : ";
+                cin >> destination;
+                while (destination != 'P' && destination != 'M')
+                {
+                    cout << "\nInvalid destination. Please re-enter destination : ";
+                    cin >> destination;
+                }
+
+                if (status == 'N') {
+
+                    cout << "\nEnter age [ 1-Below 13 | 2-13 and Above ] : ";
+                    cin >> choose;
+                    while (choose != '1' && choose != '2')
+                    {
+                        cout << "\nInvalid age. Please re-enter age : ";
+                        cin >> choose;
+                    }
+
+                    if (choose == '1') {
+                        countAge1++;
+                        if (destination == 'P') {
+                            place = "Pangkor Jetty";
+                            price = 10;
+                        }
+                        else if (destination == 'M') {
+                            place = "Marina Jetty";
+                            price = 18;
+                        }
+                    }
+                    else if (choose == '2') {
+                        countAge2++;
+                        if (destination == 'P') {
+                            place = "Pangkor Jetty";
+                            price = 18;
+                        }
+                        else if (destination == 'M') {
+                            place = "Marina Jetty";
+                            price = 25;
+                        }
+                    }
+                }
+                else if (status == 'O') {
+                    countOKU++;
+                    price = 10;
+                }
+
+                sumPrice += price;
+
+            }//End_for_loop
+
+
+            boardingTime(time);
+
+            //Start add-on 
+            system("CLS");
+            addOnMenu();
+            cout << "\nDo you want add-on? [Y-Yes | N-No] : ";
+            cin >> option;
+            if (option == 'Y') {
+                int  addPrice = 0;
+                do {
+                    cout << "\nChoose an add-on item [F-Breakfast | L-Lunch | D-Dinner | B-Bag] : ";
+                    cin >> choose;
+
+                    switch (choose) {
+                    case'F':
+                        addPrice = 12.00;
+                        break;
+                    case'L':
+                        addPrice = 20.00;
+                        break;
+                    case'D':
+                        addPrice = 25.00;
+                        break;
+                    case'B':
+                        addPrice = 5.00;
+                        break;
+                    default:
+                        cout << "Thank You";
+                        break;
+                    }
+                    cout << "\nEnter the quantity : ";
+                    cin >> qty;
+
+                    subAdd = addPrice * qty;
+                    tAdd += subAdd;
+
+                    cout << "\nDo you want to continue add-on? [Y-Yes | N-No] : ";
+                    cin >> option;
+                    system("CLS");
+
+                    while (start != 'Y' && start != 'N')
+                    {
+                        cout << "\nRe-enter your code: ";
+                        cin.ignore();
+                        cin >> start;
+                    }
+
+                } while (option != 'N');
+            }
+            else {
+                tAdd = 0;
+            }//End_Add-on
+
+            cout << "\nTotal price for ticket(s) : RM" << sumPrice << fixed << showpoint << setprecision(2) << endl;
+            cout << "Total price for add-on : RM" << tAdd << fixed << showpoint << setprecision(2) << endl;
+
+
+            //func call
+            disRate = discountValue(paymentMethod);
+
+
+            subPrice = sumPrice + tAdd;
+
+            if (time == "T1" || time == "T2") {
+                cout << "Congratulation! You are early bird! Get 10% off!\n";
+                disPrice = subPrice * (disRate + earlyBird);
+            }
+            else {
+                disPrice = subPrice * disRate;
+            }
+            tPrice = subPrice - disPrice;
+
+            receiptDetail(name, num, numPassen, tPrice, place, subPrice, disPrice);
+
+
+            if (time == "T1") {
+                count[0] += numPassen;
+                income[0] += tPrice;
+            }
+            else if (time == "T2") {
+                count[1] += numPassen;
+                income[1] += tPrice;
+            }
+            else if (time == "T3") {
+                count[2] += numPassen;
+                income[2] += tPrice;
+            }
+            else if (time == "T4") {
+                count[3] += numPassen;
+                income[3] += tPrice;
+            }
+            else if (time == "T5") {
+                count[4] += numPassen;
+                income[4] += tPrice;
+            }
+
+            tickets = 0;
+            for (int i = 0; i < NUM_TIMESLOTS; ++i) {
+                tickets += count[i];
+            }
+            aveTickets = tickets / 5;
+
+            sumPrice = 0;
+            tAdd = 0;
+
+            cout << "\nDo you want to continue ferry ticket system? [Y-Yes | N-No]: ";
+            cin >> start;
+
+        }//End_while
+
+        //func call
+        incomeDay = calcIncome(income, count, NUM_TIMESLOTS);
+        salesDetail(count, income, countAge1, countAge2, incomeDay, aveTickets, countOKU);
+
+
+    } while (start == 'Y' && numPassen < 100);
+
+    cout << "\nThank you using our system!";
+    system("pause > 0");
+
+}
+
+void boardingTime(string& time) {
+
+    cout << "\n---------------------------------------" << endl;
+    cout << "\tcode\t|\ttime\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cout << "\tT1\t|\t7.30 a.m.\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cout << "\tT2\t|\t9.30 a.m.\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cout << "\tT3\t|\t12.00 p.m.\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cout << "\tT4\t|\t3.30 p.m.\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cout << "\tT5\t|\t5.30 p.m.\t" << endl;
+    cout << "---------------------------------------" << endl;
+    cin.ignore();
+
+    do {
+        cout << "\nChoose boarding time :";
+        cin >> time;
+        if (time != "T1" && time != "T2" && time != "T3" && time != "T4" && time != "T5")
+            cout << "Invalid boarding time. Please re-enter ";
+    } while (time != "T1" && time != "T2" && time != "T3" && time != "T4" && time != "T5");
+
+}
+
+void addOnMenu()
+{
+    cout << "ADD-ON MENU" << endl;
+    cout << " |\tITEM\t\t\t|\tPRICE(RM)  \t|\n";
+    cout << " |\tBreakfast\t\t|\t12.00/person    |\n";
+    cout << " |\tLunch\t\t\t|\t20.00/person    |\n";
+    cout << " |\tDinner\t\t\t|\t25.00/person    |\n";
+    cout << " |\tMore than 2 bag\t\t|\t5.00/person\t|\n";
+}
+double discountValue(char paymentMethod)
+{
+    double discountRate = 0.00;
+    string cardNumber, cardDate, cardCode;
+    int bank;
+
+    cout << "T -Touch 'n Go eWallet\n";
+    cout << "O -Online Banking\n";
+    cout << "S -ShopeePay\n";
+    cout << "Choose payment method : ";
+    cin >> paymentMethod;
+
+    if (paymentMethod == 'T') {
+        discountRate = 0.15;
+    }
+    else if (paymentMethod == 'O') {
+        cout << "\nChoose your bank : " << endl;
+        cout << "1.Maybank 2.Bank Islam 3.AM Bank 4.CIMB Bank 5.RHB Bank 6.AGRO Bank " << endl;
+        cout << "\n[ 1 = MAYBANK    ]" << endl;
+        cout << "[ 2 = BANK ISLAM ]" << endl;
+        cout << "[ 3 = AM BANK    ]" << endl;
+        cout << "[ 4 = CIMB BANK  ]" << endl;
+        cout << "[ 5 = RHB BANK   ]" << endl;
+        cout << "[ 6 = AGRO BANK  ]" << endl;
+
+        do {
+            cout << "\nBank [1 to 6] : ";
+            cin >> bank;
+            if (bank < 1 && bank > 6) {
+                cout << "\nYou enter wrong code. Please re-enter your bank's code : " << endl;
+            }
+        } while (bank < 1 && bank > 6);
+        cout << "\nEnter your card number : ";
+        cin >> cardNumber;
+        cout << "\nEnter your expiration date (MMYY) : ";
+        cin >> cardDate;
+        cout << "\nEnter your security code (exp: 759) : ";
+        cin >> cardCode;
+        discountRate = 0.10;
+    }
+    else if (paymentMethod == 'S') {
+        discountRate = 0.05;
+    }
+    else {
+        discountRate = 0;
+    }
+    return discountRate;
+
+}
+
+double calcIncome(double income[], int count[], int size)
+{
+    double totalIncome = 0.0;
+
+    for (int i = 0; i < size; ++i)
+    {
+        totalIncome += income[i];
+    }
+    return totalIncome;
+}
+
+void salesDetail(int count[], double income[], int countAge1, int countAge2, double incomeDay, int aveTickets, int countOKU)
+{
+    system("CLS");
+    cout << "****************************************************************************************************************" << endl;
+    cout << "*                                                SALES DETAILED                                              *" << endl;
+    cout << "****************************************************************************************************************" << endl;
+    cout << "\nTotal customers at 7.30 a.m.: " << count[0];
+    cout << "\nIncome at 7.30 a.m.\t: RM" << income[0] << fixed << showpoint << setprecision(2);
+    cout << "\n\nTotal customers at 9.30 a.m.: " << count[1];
+    cout << "\nIncome at 9.30 a.m.\t: RM" << income[1] << fixed << showpoint << setprecision(2);
+    cout << "\n\nTotal customers at 12.00 p.m.: " << count[2];
+    cout << "\nIncome at 12.00 p.m.\t: RM" << income[2] << fixed << showpoint << setprecision(2);
+    cout << "\n\nTotal customers at 3.30 p.m.: " << count[3];
+    cout << "\nIncome at 3.30 p.m.\t: RM" << income[3] << fixed << showpoint << setprecision(2);
+    cout << "\n\nTotal customers at 5.30 p.m.: " << count[4];
+    cout << "\nIncome at 5.30 p.m.\t: RM" << income[4] << fixed << showpoint << setprecision(2);
+    cout << "\n\nTotal customer(s) under 13 years old : " << countAge1;
+    cout << "\n\nTotal customer(s) 13 years old and above : " << countAge2;
+    cout << "\n\nTotal customer(s) OKU : " << countOKU;
+    cout << "\n\nAverage ticket per boarding time : " << aveTickets;
+    cout << "\n_________________________________________________________________________________________________________________";
+    cout << "\nTOTAL INCOME IN A DAY : RM" << incomeDay << fixed << showpoint << setprecision(2);
+    cout << "\n_________________________________________________________________________________________________________________";
+}
+
+void receiptDetail(string name, string num, int numPassen, double tPrice, string place, double subPrice, double disPrice)
+{
+    system("CLS");
+    cout << "****************************************************************************************************************" << endl;
+    cout << "*                                                RECEIPT DETAILED                                              *" << endl;
+    cout << "****************************************************************************************************************" << endl;
+    cout << "\nYour detail has been confirmed" << endl;
+    cout << "\nDestination :" << place;
+    cout << "\nPassenger name :" << name;
+    cout << "\nTelephone Number :+6" << num;
+    cout << "\nTotal ticket purchase :" << numPassen;
+    cout << "\nSubtotal : RM" << subPrice << fixed << showpoint << setprecision(2);
+    cout << "\nDiscount Price : RM" << disPrice << fixed << showpoint << setprecision(2);
+
+    cout << "\n_________________________________________________________________________________________________________________";
+    cout << "\nTOTAL AMOUNT :RM" << tPrice << fixed << showpoint << setprecision(2);
+    cout << "\n_________________________________________________________________________________________________________________";
+    cout << "\nYour ticket will be send to this telephone number :+6" << num << endl;
+}
